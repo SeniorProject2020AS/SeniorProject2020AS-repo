@@ -2,12 +2,14 @@
 #include <Adafruit_MotorShield.h> //Drive motors using Adafruit Motor Driver Board 
 #include <Adafruit_RGBLCDShield.h> //Display text and change colors on LCD Display
 
-int SteppingMotorDirectionPin = 8; //Sets the direction (clockwise/counterclockwise) of the stepping motor
-int SteppingMotorStepFrequencyPin = 9; //Used to set the frequency of steps for the stepping motor, important when regulating the size/shape of the pearls
+//unused
+//int SteppingMotorDirectionPin = 8; //Sets the direction (clockwise/counterclockwise) of the stepping motor
+//unused
+//int SteppingMotorStepFrequencyPin = 9; //Used to set the frequency of steps for the stepping motor, important when regulating the size/shape of the pearls
 int stepper = 0;
 int currentpercentage= 0;
 
-// Abort on Stepper 0 disable 1 active (with the jump issue on stepper each second) 
+// Abort on Stepper 0 disable, 1 active (with the jump issue on stepper each second) 
 int AbortOnStepper=0;
  
 // Progress apprear 1 by 1 on Stepper stage OneByOneStepper=1 (with the jump issue on stepper each change of progress)
@@ -31,11 +33,14 @@ Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield(); //Creates an LCD object, us
 
 // Creates constants used for controlling the backlight color of the LCD display
 #define RED 0x1
-#define YELLOW 0x3
-#define GREEN 0x2
+//unused
+//#define YELLOW 0x3
+//#define GREEN 0x2
+//#define BLUE 0x4
+//#define VIOLET 0x5
 #define TEAL 0x6
-#define BLUE 0x4
-#define VIOLET 0x5
+
+
 #define WHITE 0x7
 
 // Creates constants used to keep track of the current state of the machine, identifies the current menu option/selection from the user
