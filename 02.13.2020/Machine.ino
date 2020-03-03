@@ -7,6 +7,7 @@
 int SteppingMotorDirectionPin = 8; //Sets the direction (clockwise/counterclockwise) of the stepping motor
 
 int SteppingMotorStepFrequencyPin = 9; //Used to set the frequency of steps for the stepping motor, important when regulating the size/shape of the pearls
+
 int stepper = 0;
 int currentpercentage= 0;
 
@@ -44,7 +45,7 @@ void setup() {
   AdafruitMotorDriverBoard.begin();
 
   setUpPump(NaAlgPump, 255);
-  setUpPump(BlenderStomach, 30);
+  setUpPump(BlenderStomach, 25);
   setUpPump(CalciumBathPump, 255);
   setUpPump(CalciumBathExtractionPump, 255);
 
@@ -77,6 +78,7 @@ if(menu.isRunning(currentstatus)) {
   
   int percentage = (int)( ((100 * calculatedSecond) / (265+60)));
   int updateprogress;
+  
   if (OneByOneStepper==1 || (OneByOneStepper==0 && (calculatedSecond <265 || calculatedSecond > (265+60)))) {
     // progress 1 by 1
     updateprogress=(currentpercentage!=percentage);
@@ -259,9 +261,8 @@ if(menu.isRunning(currentstatus)) {
 // Menu navigation
 /////////////////////////////////////////
 }else {
-    menu.getButtonStatus();
+    buttons = menu.getButtonStatus();
     //    buttons = lcd.readButtons();
-    
     if (buttons && pressed==0) {
       menu.setMenu();
       pressed = 1;
