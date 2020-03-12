@@ -261,11 +261,7 @@ void loop()
 
     if (buttons && pressed==0) {
       if((currentstatus==START || currentstatus==SYSTEMSETTINGS) && buttons & BUTTON_LEFT) {
-        LCD.clear();
-        LCD.setCursor(0,0);
-        LCD.print("Ready");
-        LCD.setBacklight(WHITE);
-        currentstatus=READY;
+        set_to_idle();
         Serial.println("READY");
         pressed=1;
       } else
@@ -287,12 +283,12 @@ void loop()
         LCD.setBacklight(TEAL);
         currentstatus=RUNNING;
     stepper=0;
-        startrun=1;
+        set_vars_for_pumps();
         Serial.println("RUNNING");
         pressed=1;
-        currentTime = millis();
+        
     currentpercentage = 0;
-        rollover = (unsigned long)(currentTime)/1000;
+        
       } else
       if ((currentstatus==START && buttons & BUTTON_DOWN) || ((currentstatus==PRIMEPUMPS || currentstatus==CLEANSE) && buttons & BUTTON_LEFT)) {
         LCD.clear();
@@ -377,13 +373,12 @@ void loop()
         LCD.print("Running Prime Na a");
         LCD.setBacklight(RED);
         currentstatus=RUNNING1;
-        startrun=1;
+        set_vars_for_pumps();
         Serial.println("RUNNING1");
         pressed=1;
         NaAlgPump->run(FORWARD);  //Runs motor forward
         Serial.println("Manual Prime Na a started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime)/1000;
+        
       } else
       if (currentstatus==PUMP2 &&(buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
         LCD.clear();
@@ -391,13 +386,12 @@ void loop()
         LCD.print("Running Prime ca input pump");
         LCD.setBacklight(RED);
         currentstatus=RUNNING2;
-        startrun=1;
+        set_vars_for_pumps();
         Serial.println("RUNNING2");
         pressed=1;
         CalciumBathPump->run(FORWARD);  //Runs motor forward
         Serial.println("Manual Prime ca input started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime)/1000;
+        
       } else
       if (currentstatus==PUMP3 &&(buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
         LCD.clear();
@@ -405,13 +399,12 @@ void loop()
         LCD.print("Running ca exit pump");
         LCD.setBacklight(RED);
         currentstatus=RUNNING3;
-        startrun=1;
+        set_vars_for_pumps();
         Serial.println("RUNNING3");
         pressed=1;
         CalciumBathExtractionPump->run(FORWARD);  //Runs motor forward
         Serial.println("Manual ca exit pump started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime)/1000;
+        
       } else
       if (currentstatus==PUMP4 &&(buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
         LCD.clear();
@@ -419,12 +412,11 @@ void loop()
         LCD.print("Running spout pump");
         LCD.setBacklight(RED);
         currentstatus=RUNNING4;
-        startrun=1;
+        set_vars_for_pumps();
         Serial.println("RUNNING4");
         pressed=1;
         Serial.println("Manual spout pump started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime)/1000;
+        
       }
     } else
     if (buttons==0  && pressed==1) {
@@ -432,6 +424,12 @@ void loop()
       pressed=0;
     }
   }
+}
+/*set proper variables when running pumps 1-4*/
+void set_vars_for_pumps(){
+  startrun = 1;
+  currentTime = millis();
+  rollover = (unsigned long)(currentTime)/1000;
 }
 /*Change the status of the machine, which refers to Ready or running a particular pump*/
 void set_to_idle(){
