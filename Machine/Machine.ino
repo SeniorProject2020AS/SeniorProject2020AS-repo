@@ -57,7 +57,7 @@ Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield(); //Creates an LCD object, us
 #define RUNNING3 2131
 #define RUNNING4 2141
 
-int currentstatus = READY;
+int currentstatus;
 int pressed = 0;
 int startrun = 0;
 
@@ -74,8 +74,7 @@ void setup() {
   pinMode(SteppingMotorStepFrequencyPin, OUTPUT);
   
   LCD.begin(16, 2); // Setting up the LCD's number of columns (16) and rows (2)
-  LCD.print("Ready");
-  LCD.setBacklight(WHITE);
+  set_to_idle();
 }
 
 void loop() 
@@ -150,12 +149,7 @@ void loop()
             Serial.println("ABORT Motor 3 off");
             CalciumBathExtractionPump->run(RELEASE);  //Stops motor 
             Serial.println("ABORT Motor 4 off");
-            LCD.clear();
-            LCD.setCursor(0,0);
-            LCD.print("Ready");
-            LCD.setBacklight(WHITE);
-            currentstatus=READY;
-            Serial.println("READY");
+            set_to_idle();
             secondstoabort=0;
       }
     }
@@ -213,11 +207,7 @@ void loop()
       Serial.println("END OF RUNNING");
       //Serial.println("exit");
       //exit(0);                //Exit loop
-      LCD.clear();
-      LCD.setCursor(0,0);
-      LCD.print("Ready");
-      LCD.setBacklight(WHITE);
-      currentstatus=READY;
+      set_to_idle();
       secondstoabort=0;
       Serial.println("READY");
     }
@@ -252,12 +242,7 @@ void loop()
               CalciumBathExtractionPump->run(RELEASE);  //Stops motor
               Serial.println("Manual Motor 4 off");
            }
-           LCD.clear();
-           LCD.setCursor(0,0);
-           LCD.print("Ready");
-           LCD.setBacklight(WHITE);
-           currentstatus=READY;
-           Serial.println("READY");
+           set_to_idle();
       }
       } 
     if(currentstatus==RUNNING4){
@@ -447,6 +432,14 @@ void loop()
       pressed=0;
     }
   }
+}
+/*Change the status of the machine, which refers to Ready or running a particular pump*/
+void set_to_idle(){
+  LCD.clear();
+  LCD.setCursor(0, 0);
+  LCD.print("Ready");
+  LCD.setBacklight(WHITE);
+  currentstatus = READY;  
 }
 
 void SetupPump(Adafruit_DCMotor *pump, int speed) {
