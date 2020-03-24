@@ -59,9 +59,10 @@ Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield(); //Creates an LCD object, us
 #define RUNNING3 2131
 #define RUNNING4 2141
 
-int currentstatus = READY;
+
 int pressed = 0;
 int startrun = 0;
+int currentstatus = READY;
 
 void setup() {
   Serial.begin(9600); //Initialize serial data communication, set to baud rate of 9600
@@ -76,8 +77,10 @@ void setup() {
   pinMode(SteppingMotorStepFrequencyPin, OUTPUT);
 
   LCD.begin(16, 2); // Setting up the LCD's number of columns (16) and rows (2)
-  LCD.print("Ready");
-  LCD.setBacklight(WHITE);
+  set_to_idle();
+  
+  //LCD.print("Ready");
+  //LCD.setBacklight(WHITE);
 }
 
 void loop()
@@ -105,14 +108,15 @@ void loop()
     if (updateprogress) {
       {
         currentpercentage = percentage;
-        LCD.setCursor(9, 0);
-        LCD.print(currentpercentage);
-        if (currentpercentage < 10) {
-          LCD.setCursor(10, 0);
-        } else if (currentpercentage < 100) {
-          LCD.setCursor(11, 0);
-        }
-        LCD.print("%");
+        print_progress(currentpercentage);
+//        LCD.setCursor(9, 0);
+//        LCD.print(currentpercentage);
+//        if (currentpercentage < 10) {
+//          LCD.setCursor(10, 0);
+//        } else if (currentpercentage < 100) {
+//          LCD.setCursor(11, 0);
+//        }
+//        LCD.print("%");
       }
     }
     if (calculatedSecond != currentSecond) {
@@ -152,11 +156,7 @@ void loop()
           Serial.println("ABORT Motor 3 off");
           CalciumBathExtractionPump->run(RELEASE);  //Stops motor
           Serial.println("ABORT Motor 4 off");
-          LCD.clear();
-          LCD.setCursor(0, 0);
-          LCD.print("Ready");
-          LCD.setBacklight(WHITE);
-          currentstatus = READY;
+          set_to_idle();
           Serial.println("READY");
           secondstoabort = 0;
         }
@@ -212,11 +212,7 @@ void loop()
       Serial.println("END OF RUNNING");
       //Serial.println("exit");
       //exit(0);                //Exit loop
-      LCD.clear();
-      LCD.setCursor(0, 0);
-      LCD.print("Ready");
-      LCD.setBacklight(WHITE);
-      currentstatus = READY;
+      set_to_idle();
       secondstoabort = 0;
       Serial.println("READY");
     }
@@ -250,11 +246,7 @@ void loop()
           CalciumBathExtractionPump->run(RELEASE);  //Stops motor
           Serial.println("Manual Motor 4 off");
         }
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Ready");
-        LCD.setBacklight(WHITE);
-        currentstatus = READY;
+        set_to_idle();
         Serial.println("READY");
       }
     }
@@ -271,20 +263,22 @@ void loop()
 
     if (buttons && pressed == 0) {
       if ((currentstatus == START || currentstatus == SYSTEMSETTINGS) && buttons & BUTTON_LEFT) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Ready");
-        LCD.setBacklight(WHITE);
-        currentstatus = READY;
+          set_to_idle();
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Ready");
+//        LCD.setBacklight(WHITE);
+//        currentstatus = READY; 
         Serial.println("READY");
         pressed = 1;
       } else if ((currentstatus == READY && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) || (currentstatus == SYSTEMSETTINGS && buttons & BUTTON_UP)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(">>Start");
-        LCD.setCursor(0, 1);
-        LCD.print("System Settings");
-        LCD.setBacklight(WHITE);
+          change_parent_menu_display(">>Start", "System Settings");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print(">>Start");
+//        LCD.setCursor(0, 1);
+//        LCD.print("System Settings");
+//        LCD.setBacklight(WHITE);
         currentstatus = START;
         Serial.println("START");
         pressed = 1;
@@ -295,133 +289,134 @@ void loop()
         LCD.setBacklight(TEAL);
         currentstatus = RUNNING;
         stepper = 0;
-        startrun = 1;
         Serial.println("RUNNING");
         pressed = 1;
-        currentTime = millis();
         currentpercentage = 0;
-        rollover = (unsigned long)(currentTime) / 1000;
+        set_vars_for_pumps();
       } else if ((currentstatus == START && buttons & BUTTON_DOWN) || ((currentstatus == PRIMEPUMPS || currentstatus == CLEANSE) && buttons & BUTTON_LEFT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Start");
-        LCD.setCursor(0, 1);
-        LCD.print(">>System Settings");
-        LCD.setBacklight(WHITE);
+          change_child_menu_display("Start", ">>System Settings");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Start");
+//        LCD.setCursor(0, 1);
+//        LCD.print(">>System Settings");
+//        LCD.setBacklight(WHITE);
         currentstatus = SYSTEMSETTINGS;
         Serial.println("SYSTEMSETTINGS");
         pressed = 1;
       } else if ((currentstatus == SYSTEMSETTINGS && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) || (currentstatus == CLEANSE && buttons & BUTTON_UP)  || (currentstatus >= PUMP1 && buttons & BUTTON_LEFT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(">>Prime Pumps");
-        LCD.setCursor(0, 1);
-        LCD.print("Cleanse");
-        LCD.setBacklight(WHITE);
+          change_parent_menu_display(">>Prime Pumps", "Cleanse");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print(">>Prime Pumps");
+//        LCD.setCursor(0, 1);
+//        LCD.print("Cleanse");
+//        LCD.setBacklight(WHITE);
         currentstatus = PRIMEPUMPS;
         Serial.println("PRIMEPUMPS");
         pressed = 1;
       } else if (currentstatus == PRIMEPUMPS && buttons & BUTTON_DOWN) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Prime Pumps");
-        LCD.setCursor(0, 1);
-        LCD.print(">>Cleanse");
-        LCD.setBacklight(WHITE);
+          change_child_menu_display("Prime Pumps",">>Cleanse");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Prime Pumps");
+//        LCD.setCursor(0, 1);
+//        LCD.print(">>Cleanse");
+//        LCD.setBacklight(WHITE);
         currentstatus = CLEANSE;
         Serial.println("CLEANSE");
         pressed = 1;
       } else if ((currentstatus == PRIMEPUMPS && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) || (currentstatus == PUMP2 && buttons & BUTTON_UP)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(">>Prime Na-alg Pump");
-        LCD.setCursor(0, 1);
-        LCD.print("Prime Ca input Pump");
-        LCD.setBacklight(WHITE);
+          change_parent_menu_display(">>Prime Na-Alg Pump", "Prime Ca input Pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print(">>Prime Na-alg Pump");
+//        LCD.setCursor(0, 1);
+//        LCD.print("Prime Ca input Pump");
+//        LCD.setBacklight(WHITE);
         currentstatus = PUMP1;
         Serial.println("PUMP1");
         pressed = 1;
       } else if ((currentstatus == PUMP1 && buttons & BUTTON_DOWN) || (currentstatus == PUMP3 && buttons & BUTTON_UP)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(">>Prime Ca input Pump");
-        LCD.setCursor(0, 1);
-        LCD.print("Prime Ca exit Pump");
-        LCD.setBacklight(WHITE);
+          change_parent_menu_display(">>Prime Ca input Pump", "Prime Ca exit pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print(">>Prime Ca input Pump");
+//        LCD.setCursor(0, 1);
+//        LCD.print("Prime Ca exit Pump");
+//        LCD.setBacklight(WHITE);
         currentstatus = PUMP2;
         Serial.println("PUMP2");
         pressed = 1;
       } else if ((currentstatus == PUMP2 && buttons & BUTTON_DOWN) || (currentstatus == PUMP4 && buttons & BUTTON_UP)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print(">>Prime Ca exit Pump");
-        LCD.setCursor(0, 1);
-        LCD.print("Prime spout Pump");
-        LCD.setBacklight(WHITE);
+          change_parent_menu_display(">>Prime Ca exit pump", "Prime Spout Pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print(">>Prime Ca exit Pump");
+//        LCD.setCursor(0, 1);
+//        LCD.print("Prime spout Pump");
+//        LCD.setBacklight(WHITE);
         currentstatus = PUMP3;
         Serial.println("PUMP3");
         pressed = 1;
       } else if (currentstatus == PUMP3 && buttons & BUTTON_DOWN) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Prime Ca exit Pump");
-        LCD.setCursor(0, 1);
-        LCD.print(">>Prime spout Pump");
-        LCD.setBacklight(WHITE);
+          change_child_menu_display("Prime Ca exit pump", ">>Prime Spout Pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Prime Ca exit Pump");
+//        LCD.setCursor(0, 1);
+//        LCD.print(">>Prime spout Pump");
+//        LCD.setBacklight(WHITE);
         currentstatus = PUMP4;
         Serial.println("PUMP4");
         pressed = 1;
       } else if (currentstatus == PUMP1 && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Running Prime Na a");
-        LCD.setBacklight(RED);
+          primeStatus("Running Prime Na a"); 
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Running Prime Na a");
+//        LCD.setBacklight(RED);
         currentstatus = RUNNING1;
-        startrun = 1;
         Serial.println("RUNNING1");
-        pressed = 1;
+        pressed = 1;  
         NaAlgPump->run(FORWARD);  //Runs motor forward
         Serial.println("Manual Prime Na a started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime) / 1000;
+        set_vars_for_pumps();
       } else if (currentstatus == PUMP2 && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Running Prime ca input pump");
-        LCD.setBacklight(RED);
+          primeStatus("Running Prime ca input pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Running Prime ca input pump");
+//        LCD.setBacklight(RED);
         currentstatus = RUNNING2;
-        startrun = 1;
         Serial.println("RUNNING2");
         pressed = 1;
         CalciumBathPump->run(FORWARD);  //Runs motor forward
         Serial.println("Manual Prime ca input started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime) / 1000;
+        set_vars_for_pumps();
       } else if (currentstatus == PUMP3 && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Running ca exit pump");
-        LCD.setBacklight(RED);
-        currentstatus = RUNNING3;
-        startrun = 1;
-        Serial.println("RUNNING3");
-        pressed = 1;
-        CalciumBathExtractionPump->run(FORWARD);  //Runs motor forward
-        Serial.println("Manual ca exit pump started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime) / 1000;
+          primeStatus("Running ca exit pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Running ca exit pump");
+//        LCD.setBacklight(RED);
+          currentstatus = RUNNING3;
+          Serial.println("RUNNING3");
+          pressed = 1;
+          CalciumBathExtractionPump->run(FORWARD);  //Runs motor forward
+          Serial.println("Manual ca exit pump started");
+          set_vars_for_pumps();
       } else if (currentstatus == PUMP4 && (buttons & BUTTON_RIGHT || buttons & BUTTON_SELECT)) {
-        LCD.clear();
-        LCD.setCursor(0, 0);
-        LCD.print("Running spout pump");
-        LCD.setBacklight(RED);
-        currentstatus = RUNNING4;
-        startrun = 1;
-        Serial.println("RUNNING4");
-        pressed = 1;
-        Serial.println("Manual spout pump started");
-        currentTime = millis();
-        rollover = (unsigned long)(currentTime) / 1000;
+          primeStatus("Running spout pump");
+//        LCD.clear();
+//        LCD.setCursor(0, 0);
+//        LCD.print("Running spout pump");
+//        LCD.setBacklight(RED);
+          currentstatus = RUNNING4;
+          Serial.println("RUNNING4");
+          pressed = 1;
+          Serial.println("Manual spout pump started");
+          set_vars_for_pumps();
       }
     } else if (buttons == 0  && pressed == 1) {
       // button released
@@ -430,6 +425,70 @@ void loop()
   }
 }
 
+/*Change the display text to show parent menu selected and child menu is not*/
+void change_parent_menu_display(String parent_menu, String child_menu){
+
+  LCD.clear();
+  LCD.setCursor(0, 0);
+  LCD.print(parent_menu);
+  LCD.setCursor(0, 1);
+  LCD.print(child_menu);
+  LCD.setBacklight(WHITE);  
+}
+
+/*Change the display text to show child menu selected and parent menu is not*/
+void change_child_menu_display(String parent_menu, String child_menu){
+  
+  LCD.clear();
+  LCD.setCursor(0, 0);
+  LCD.print(parent_menu);
+  LCD.setCursor(0, 1);
+  LCD.print(child_menu);
+  LCD.setBacklight(WHITE);
+  
+}
+
+/*set cursor to correct position to place % after progress number*/
+void print_percent_symb(int percent){
+  if(percent < 10){
+    LCD.setCursor(10, 0);
+  }
+  else if(percent < 100){
+    LCD.setCursor(11, 0);
+  }
+  LCD.print("%");
+}
+
+/*display on LCD which pump is running*/
+void primeStatus(String runPump){
+  LCD.clear();
+  LCD.setCursor(0, 0);
+  LCD.print(runPump);
+  LCD.setBacklight(RED);
+}
+
+/*prints the percent progress on LCD*/
+void print_progress(int percent){
+  LCD.setCursor(9, 0);
+  LCD.print(percent);
+  print_percent_symb(percent);
+}
+
+/*Change the status of the machine, which refers to Ready or running a particular pump*/
+void set_to_idle(){
+  LCD.clear();
+  LCD.setCursor(0, 0);
+  LCD.print("Ready");
+  LCD.setBacklight(WHITE);
+  currentstatus = READY;  
+}
+/*set proper variables when running pumps 1-4*/
+void set_vars_for_pumps(){
+  startrun = 1;
+  currentTime = millis();
+  rollover = (unsigned long)(currentTime)/1000;
+}
+/*set up a pump*/
 void SetupPump(Adafruit_DCMotor *pump, int speed) {
   pump->setSpeed(speed); // Sets speed of motor
   pump->run(FORWARD); // Sets direction of motor
