@@ -19,8 +19,6 @@ class LcdMenu{
     void setupLcd();
     void set_to_idle();
     
-    
-    
   private:
     // These #defines make it easy to set the backlight color for LCD display
     #define RED 0x1
@@ -62,5 +60,4 @@ class LcdMenu{
     void change_parent_menu_display(String parent, String child, int a_status);
     void change_child_menu_display(String parent,String child,int a_status);
 };
-
 #endif
