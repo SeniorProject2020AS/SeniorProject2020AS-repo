@@ -3,7 +3,6 @@
 /*construct adafruit lcd and map*/
 LcdMenu::LcdMenu(){
     lcd_= Adafruit_RGBLCDShield();
-    currentStatus_ = READY;
 }
 
 /*Get the status of the machine, which is referenced by the menu*/
@@ -192,7 +191,6 @@ void LcdMenu::change_parent_menu_display(String parent_menu, String child_menu, 
 
 /*Change the display text to show child menu selected and parent menu is not*/
 void LcdMenu::change_child_menu_display(String parent_menu, String child_menu, int a_status){
-  
   lcd_.clear();
   lcd_.setCursor(0, 0);
   lcd_.print(parent_menu);
@@ -200,5 +198,4 @@ void LcdMenu::change_child_menu_display(String parent_menu, String child_menu, i
   lcd_.print(child_menu);
   lcd_.setBacklight(WHITE);
   currentStatus_ = a_status;
-  
 }

@@ -3,8 +3,28 @@
 #include <Adafruit_MotorShield.h> //Drive motors using Adafruit Motor Driver Board 
 #include <Adafruit_RGBLCDShield.h> //Display text and change colors on LCD Display
 
+////////////////////////////////////////////////
+// Variables that affect the geometry of pearls:
+////////////////////////////////////////////////
+
 int highTime = 90; //Sets the frequency of steps of the stepper motor pump (30 being the fastest)
 int lowTime = 20; //Sets the frequency of steps of the stepper motor pump (10 being the fastest)
+int NaAlgPumpSpeed = 255; //Speed of Sodium Alginate pump
+int BlenderStomachSpeed = 30; //Speed of Blender Stomach
+int CalciumBathPumpSpeed = 255; //Speed of Calcium Bath pump
+int CalciumBathExtractionPumpSpeed = 255; //Speed of Calcium Bath Extraction pump
+int NaAlgPumpTime = 35; //Running time of Sodium Alginate pump
+int BlenderStomachTime = 265; //Running time of Blender Stomach
+int CalciumBathPumpTime = 267; //Running time of Calcium Bath pump
+int CalciumBathExtractionPumpTime = 30; //Running time of Calcium Bath Extraction pump
+int SpoutPumpStartTime = 265; //Time at which Spout pump starts
+int SpoutPumpStopTime = 325; //Time at which Spout pump stops
+int MachineStopTime = 325; //Time at which the machine stops
+
+////////////////////////////////////////////////
+// Do not change variables below this line!
+////////////////////////////////////////////////
+
 int SteppingMotorDirectionPin = 8; //Sets the direction (clockwise/counterclockwise) of the stepping motor
 int SteppingMotorStepFrequencyPin = 9; //Used to set the frequency of steps for the stepping motor, important when regulating the size/shape of the pearls
 int stepper = 0;
@@ -43,10 +63,10 @@ void setup() {
   Serial.begin(9600); //Initialize serial data communication, set to baud rate of 9600
   AdafruitMotorDriverBoard.begin(); //Begin communication with Adafruit Motor Driver Board
 
-  SetupPump(NaAlgPump, 255); //Setting up NaAlgPump, speed = 255
-  SetupPump(BlenderStomach, 30); //Setting up BlenderStomach, speed = 255
-  SetupPump(CalciumBathPump, 255); //Setting up CalciumBathPump, speed = 255
-  SetupPump(CalciumBathExtractionPump, 255); //Setting up CalciumBathExtractionPump, speed = 255
+  SetupPump(NaAlgPump, NaAlgPumpSpeed); //Setting up NaAlgPump, speed = 255
+  SetupPump(BlenderStomach, BlenderStomachSpeed); //Setting up BlenderStomach, speed = 30
+  SetupPump(CalciumBathPump, CalciumBathPumpSpeed); //Setting up CalciumBathPump, speed = 255
+  SetupPump(CalciumBathExtractionPump, CalciumBathExtractionPumpSpeed); //Setting up CalciumBathExtractionPump, speed = 255
 
   pinMode(SteppingMotorDirectionPin, OUTPUT);
   pinMode(SteppingMotorStepFrequencyPin, OUTPUT);
@@ -120,30 +140,30 @@ void loop()
       if (menu.isRunning(menu.getStatus())) {
         if (currentSecond == 0) {
           NaAlgPump->run(FORWARD);  //Runs motor forward
-        } else if (currentSecond == (0 + 35)) {
+        } else if (currentSecond == (NaAlgPumpTime)) {
           NaAlgPump->run(RELEASE);  //Stops motor
         }
 
         if (currentSecond == 5) {
           BlenderStomach->run(FORWARD);  //Runs motor forward
-        } else if (currentSecond == (5 + 260)) {
+        } else if (currentSecond == (BlenderStomachTime)) {
           BlenderStomach->run(RELEASE);  //Stops motor
         }
 
         if (currentSecond == 0) {
           CalciumBathPump->run(FORWARD);  //Runs motor forward
-        } else if (currentSecond == (0 + 267)) {
+        } else if (currentSecond == (CalciumBathPumpTime)) {
           CalciumBathPump->run(RELEASE);  //Stops motor
         }
 
         if (currentSecond == 0) {
           CalciumBathExtractionPump->run(FORWARD);  //Runs motor forward
-        } else if (currentSecond == (0 + 30)) {
+        } else if (currentSecond == (CalciumBathExtractionPumpTime)) {
           CalciumBathExtractionPump->run(RELEASE);  //Stops motor
         }
       }
     }
-    if (calculatedSecond >= 265 && calculatedSecond <= (265 + 60))
+    if (calculatedSecond >= SpoutPumpStartTime && calculatedSecond <= SpoutPumpStopTime)
     {
       if (stepper == 0) {
         stepper = 1;
@@ -151,7 +171,7 @@ void loop()
       RunSpoutPump();
     }
 
-    if (currentSecond >= (265 + 60)) {
+    if (currentSecond >= MachineStopTime) {
       delay(1000);
       menu.set_to_idle();
       secondstoabort = 0;
