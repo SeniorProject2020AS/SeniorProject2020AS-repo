@@ -3,11 +3,11 @@
 /*construct adafruit lcd and map*/
 LcdMenu::LcdMenu(){
     lcd_= Adafruit_RGBLCDShield();
+    currentStatus_ = READY;
 }
 
 /*Get the status of the machine, which is referenced by the menu*/
 int LcdMenu::getStatus(){
-  
   return currentStatus_;
 }
 
