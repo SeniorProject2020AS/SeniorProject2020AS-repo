@@ -20,6 +20,10 @@ int CalciumBathExtractionPumpTime = 30; //Running time of Calcium Bath Extractio
 int SpoutPumpStartTime = 265; //Time at which Spout pump starts
 int SpoutPumpStopTime = 325; //Time at which Spout pump stops
 int MachineStopTime = 325; //Time at which the machine stops
+int NaAlgPumpStartTime = 0; //Time at which Sodium Alginate pump starts
+int BlenderStomachStartTime = 5; //Time at which Blender Stomach starts
+int CalciumBathPumpStartTime = 0; //Time at which Calcium Bath pump starts
+int CalciumBathExtractionPumpStartTime = 0; //Time at which Calcium Bath Extraction pump starts
 
 ////////////////////////////////////////////////
 // Do not change variables below this line!
@@ -138,25 +142,25 @@ void loop()
       }
 
       if (menu.isRunning(menu.getStatus())) {
-        if (currentSecond == 0) {
+        if (currentSecond == NaAlgPumpStartTime) {
           NaAlgPump->run(FORWARD);  //Runs motor forward
         } else if (currentSecond == (NaAlgPumpTime)) {
           NaAlgPump->run(RELEASE);  //Stops motor
         }
 
-        if (currentSecond == 5) {
+        if (currentSecond == BlenderStomachStartTime) {
           BlenderStomach->run(FORWARD);  //Runs motor forward
         } else if (currentSecond == (BlenderStomachTime)) {
           BlenderStomach->run(RELEASE);  //Stops motor
         }
 
-        if (currentSecond == 0) {
+        if (currentSecond == CalciumBathPumpStartTime) {
           CalciumBathPump->run(FORWARD);  //Runs motor forward
         } else if (currentSecond == (CalciumBathPumpTime)) {
           CalciumBathPump->run(RELEASE);  //Stops motor
         }
 
-        if (currentSecond == 0) {
+        if (currentSecond == CalciumBathExtractionPumpStartTime) {
           CalciumBathExtractionPump->run(FORWARD);  //Runs motor forward
         } else if (currentSecond == (CalciumBathExtractionPumpTime)) {
           CalciumBathExtractionPump->run(RELEASE);  //Stops motor
