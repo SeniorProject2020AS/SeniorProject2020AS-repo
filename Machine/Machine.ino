@@ -1,3 +1,15 @@
+/*
+Automated Spherification Apparatus for Multisensory Molecular Gastronomy Experiences
+
+The machine is controlled by an Arduino Uno board and is comprised of a User Interface
+on the front-right side consisting of an LCD display, used for outputing information
+to the user, and a keypad, used by the user to input commands to the machine. Based on
+the user's input, the Arduino Uno board executes different modes of operation and takes 
+the appropriate set of actions, such as: displaying a series of menus to the user,
+controlling hardware inside the machine, displaying progress of tasks, and checking
+for user input.
+*/
+
 #include "LcdMenu.h"
 #include <Wire.h> //Serial communication
 #include <Adafruit_MotorShield.h> //Drive motors using Adafruit Motor Driver Board 
