@@ -1,3 +1,7 @@
+/*LcdMenu contains allows user to navigate through
+menu system in order to start the machine or allow
+the machine to do maintenance*/
+
 #include "LcdMenu.h"
 
 /*construct adafruit lcd and map*/
